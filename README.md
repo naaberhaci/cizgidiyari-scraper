@@ -19,7 +19,7 @@ gerekli parametreleri gösterecektir. ÇizgiDiyarı linkleri ziyaretçilerden gi
 
 `url` olarak "sıralı liste" sayfalarından birini veriniz. --user ve --pw parametreleri ile oturum açma bilgilerinizi veriniz. --out parametresi ile çıktı dosyasının adını belirleyebilirsiniz.
 
-Çıktı dosyası, bulunan linkleri (Mediafire ve Mega) içerir. Bu linkleri kullanarak dergileri indirebilirsiniz.
+Çıktı dosyası, bulunan linkleri (Mediafire ve Mega) içerir. Bu linkleri kullanarak dergileri indirebilirsiniz. Mega için [MegaBasterd](https://github.com/tonikelope/megabasterd), Mediafire için [Mediafire Downloader](https://github.com/Hungnth/mediafire-downloader/tree/master) gibi araçlar kullanabilirsiniz.
 
 ### Örnek Kullanım
 
