@@ -33,16 +33,18 @@ python3 scrape_links.py https://www.cizgidiyari.com/forum/k/avni-sirali-liste.35
 
 Bu sistemin dışına çıkan pek çok istisna olabileceği için kullanıcının istediği tüm linkleri topladığını elle kontrol etmesi önerilir.
 
-# Rename Script
-`rename_files.py` dosyası:
+# Arşiv Düzenleyici
+`manage_archive.py` dosyası:
 
-İndirilen dergilerin isimlerini belirli bir formata göre düzenlemeyi deneyen bir script. Kod yeterince temiz değil ve çalıştırıldığı klasörde bir dosya sistemi hasarına yol açma riski mevcut. Dikkatli kullanınız.
+İndirilen dergilerin isimlerini belirli bir formata göre düzenlemeyi deneyen bir script. Sanırım kod yeterince temiz değil ve `--yes` ile çalıştırıldığı klasörde bir dosya sistemi hasarına yol açma riski mevcut. Yeniden isimlendirilmelerin tek tek onaylarak çalıştırılması önerilir.
 
 ## Örnek Kullanım
 
 ```bash
-python3 rename.py ../leman/
+python3 manage_archive.py ../leman/
 ```
+
+Yeniden isimlendirme tamamlandıktan sonra eksik sayılar `--detect-missing` parametresi ile tespit edilebilir ve `--replace-missing` parametresi ile eksik sayılar otomatik olarak formata uygun isimli boş dosyalarla doldurulabilir.
 
 # Lisans
 Projede kullanılan kaynak kodlar MIT lisansı altındadır.
