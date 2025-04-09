@@ -13,11 +13,15 @@ def confirm_and_move(old, new, yes):
             f"[0m?\n(enter/y to confirm, c for custom number, other key to skip): "
         )
 
+    def clear_lines(n=5):
+        # Clear the last n lines, remove artifacts from previous prints
+        sys.stdout.write("\x1b[1A\x1b[2K" * n)
+        sys.stdout.flush()
+
     def move_file(old, new):
         # Move the file using subprocess
         subprocess.run(["mv", old, new])
-        # Clear the last 5 lines, ensure no artifacts from previous print
-        sys.stdout.write("\x1b[1A\x1b[2K" * 5)
+        clear_lines(5)
         return 1
 
     if confirmation.lower() in ["y", "\n", "", "yes"]:
@@ -33,15 +37,19 @@ def confirm_and_move(old, new, yes):
 
             # Check if the new name already exists
             if os.path.exists(new):
+                clear_lines(6)
                 print(f"File {new} already exists, skipping", old)
                 return 0
             
             # Else, repeat the move with the new name
+            clear_lines(6)
             return confirm_and_move(old, new, yes)
         else:
+            clear_lines(6)
             print("Invalid order number, skipping", old)
             return 0
     else:
+        clear_lines(5)
         print("Skipping", old)
         return 0
 
