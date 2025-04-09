@@ -1,6 +1,9 @@
 import subprocess, os, argparse, sys
 
 
+LAST_ISSUE_SUFFIX = " - SON SAYI]"
+
+
 def confirm_and_move(old, new, yes):
     if yes:
         confirmation = "y"
@@ -51,9 +54,22 @@ def rename(path, undo=False, yes=False):
 
     for _, _, i in os.walk(path):
         for file in sorted(i):
+            # Find first non-digit character in the filename after the first "["
+            non_digit_idx = 0
+            for c in file[1:]:
+                non_digit_idx += 1
+                if not c.isdigit():
+                    break
+
+            is_formatted = file[0] == "[" and \
+                (
+                    file[non_digit_idx] == "]" or \
+                    file[non_digit_idx:non_digit_idx + len(LAST_ISSUE_SUFFIX)] == LAST_ISSUE_SUFFIX
+                )
+
             if undo:
-                if file[0] == "[" and file[5] == "]":
-                    file_new = file[7:]
+                if is_formatted:
+                    file_new = file[file.find("]") + 2:]
                 elif file[0] == " ":
                     file_new = file[1:]
                 else:
@@ -61,7 +77,7 @@ def rename(path, undo=False, yes=False):
                 
                 count += confirm_and_move(file, file_new, yes)
             else:
-                if file[0] == "[" and file[5] == "]":
+                if is_formatted:
                     print("skipping, already renamed", file)
                     continue
 
@@ -139,8 +155,21 @@ def detect_missing(path, replace_missing=True):
 
     for _, _, i in os.walk(path):
         for file in sorted(i):
-            if file[0] == "[" and file[5] == "]":
-                no = int(file[1:5])
+            # Find first non-digit character in the filename after the first "["
+            non_digit_idx = 0
+            for c in file[1:]:
+                non_digit_idx += 1
+                if not c.isdigit():
+                    break
+
+            is_formatted = file[0] == "[" and \
+                (
+                    file[non_digit_idx] == "]" or \
+                    file[non_digit_idx:non_digit_idx + len(LAST_ISSUE_SUFFIX)] == LAST_ISSUE_SUFFIX
+                )
+
+            if is_formatted:
+                no = int(file[1:non_digit_idx])
                 if no != last_no + 1:
                     missing.extend(range(last_no + 1, no))
                 last_no = no
