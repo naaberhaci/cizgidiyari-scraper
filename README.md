@@ -36,7 +36,9 @@ Bu sistemin dışına çıkan pek çok istisna olabileceği için kullanıcını
 # Arşiv Düzenleyici
 `manage_archive.py` dosyası:
 
-İndirilen dergilerin isimlerini belirli bir formata göre düzenlemeyi deneyen bir script. Sanırım kod yeterince temiz değil ve `--yes` ile çalıştırıldığı klasörde bir dosya sistemi hasarına yol açma riski mevcut. Yeniden isimlendirilmelerin tek tek onaylarak çalıştırılması önerilir.
+İndirilen dergilerin isimlerini belirli bir formata göre düzenlemeyi deneyen bir script. Otomatik sıra numarası ekleme, eksik sayıları tespit etme özellikleri içerir.
+
+* `--yes` ile çalıştırmayı tavsiye etmiyorum, onun yerine varsayılan tek tek kontrol etme özelliğini kullanmanızı tavsiye ederim. Nispeten eski bir diskte `--yes` ile otomatik adlandırmayı denediğimde ya dosya isimlerinin hızlıca değiştirilmesi ya da sıkıntılı bir yeni dosya ismi yazılması yüzünden bir dosya sistemi hatası almıştım.
 
 ## Örnek Kullanım
 
