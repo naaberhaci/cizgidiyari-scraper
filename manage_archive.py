@@ -4,6 +4,27 @@ import subprocess, os, argparse, sys
 LAST_ISSUE_SUFFIX = " - SON SAYI]"
 
 
+def get_non_digit_idx(file):
+    # Find first non-digit character in the filename after the first "["
+    idx = 0
+    for c in file[1:]:
+        idx += 1
+        if not c.isdigit():
+            break
+    
+    return idx
+
+
+def is_formatted(file):
+    non_digit_idx = get_non_digit_idx(file)
+    
+    return file[0] == "[" and \
+        (
+            file[non_digit_idx] == "]" or \
+            file[non_digit_idx:non_digit_idx + len(LAST_ISSUE_SUFFIX)] == LAST_ISSUE_SUFFIX
+        )
+
+
 def confirm_and_move(old, new, yes):
     if yes:
         confirmation = "y"
@@ -62,21 +83,8 @@ def rename(path, undo=False, yes=False):
 
     for _, _, i in os.walk(path):
         for file in sorted(i):
-            # Find first non-digit character in the filename after the first "["
-            non_digit_idx = 0
-            for c in file[1:]:
-                non_digit_idx += 1
-                if not c.isdigit():
-                    break
-
-            is_formatted = file[0] == "[" and \
-                (
-                    file[non_digit_idx] == "]" or \
-                    file[non_digit_idx:non_digit_idx + len(LAST_ISSUE_SUFFIX)] == LAST_ISSUE_SUFFIX
-                )
-
             if undo:
-                if is_formatted:
+                if is_formatted(file):
                     file_new = file[file.find("]") + 2:]
                 elif file[0] == " ":
                     file_new = file[1:]
@@ -85,7 +93,7 @@ def rename(path, undo=False, yes=False):
                 
                 count += confirm_and_move(file, file_new, yes)
             else:
-                if is_formatted:
+                if is_formatted(file):
                     print("skipping, already renamed", file)
                     continue
 
@@ -123,6 +131,10 @@ def rename(path, undo=False, yes=False):
                     new_file = new_file.replace(r"ÅÂ", "Ş")
                 elif r"Å" in new_file:
                     new_file = new_file.replace(r"Å", "Ş")
+                elif r"Å" in new_file:
+                    new_file = new_file.replace(r"Å", " Ş")
+                elif r"sÌ§" in new_file:
+                    new_file = new_file.replace(r"sÌ§", "ş")
                 
                 if r"Ä°" in new_file:
                     new_file = new_file.replace(r"Ä°", "İ")
@@ -163,21 +175,8 @@ def detect_missing(path, replace_missing=True):
 
     for _, _, i in os.walk(path):
         for file in sorted(i):
-            # Find first non-digit character in the filename after the first "["
-            non_digit_idx = 0
-            for c in file[1:]:
-                non_digit_idx += 1
-                if not c.isdigit():
-                    break
-
-            is_formatted = file[0] == "[" and \
-                (
-                    file[non_digit_idx] == "]" or \
-                    file[non_digit_idx:non_digit_idx + len(LAST_ISSUE_SUFFIX)] == LAST_ISSUE_SUFFIX
-                )
-
-            if is_formatted:
-                no = int(file[1:non_digit_idx])
+            if is_formatted(file):
+                no = int(file[1:get_non_digit_idx(file)])
                 if no != last_no + 1:
                     missing.extend(range(last_no + 1, no))
                 last_no = no
