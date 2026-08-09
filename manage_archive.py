@@ -31,7 +31,7 @@ def confirm_and_move(old, new, yes):
     else:
         confirmation = input(
             f"rename\n\033[1;32;40m{old}\033[0m\nto\n\033[1;32;40m{new}\033"
-            f"[0m?\n(enter/y to confirm, c for custom number, other key to skip): "
+            f"[0m?\n(enter/y to confirm, s/n to skip, or enter custom order number. ESC to exit): "
         )
 
     def clear_lines(n=5):
@@ -47,8 +47,8 @@ def confirm_and_move(old, new, yes):
 
     if confirmation.lower() in ["y", "\n", "", "yes"]:
         return move_file(old, new)
-    elif confirmation.lower() in ["c", "custom"]:
-        new_order = input("Enter custom order number: ")
+    elif confirmation.isdigit():
+        new_order = confirmation
         if new_order.isdigit():
             new_order_str = "[" + str(int(new_order)).zfill(4) + "] "
 
@@ -69,9 +69,17 @@ def confirm_and_move(old, new, yes):
             clear_lines(6)
             print("Invalid order number, skipping", old)
             return 0
-    else:
+    elif confirmation.lower() in ["s", "skip", "n", "no"]:
         clear_lines(5)
         print("Skipping", old)
+        return 0
+    elif confirmation.lower() == "\x1b":  # ESC key
+        clear_lines(5)
+        print("Exiting...")
+        sys.exit(0)
+    else:
+        clear_lines(5)
+        print("Invalid input, skipping", old)
         return 0
 
 
@@ -108,12 +116,20 @@ def rename(path, undo=False, yes=False):
                     no = file[-8:-4]
                 else:  # Try to detect the first number in the filename
                     no = ""
+                    temp_no = ""
                     for c in file:
                         if c.isdigit():
                             no += c
                         elif no:
-                            break
-                    
+                            if 1900 <= int(no) <= 2030:
+                                temp_no = no
+                                no = ""
+                            else:
+                                break
+
+                    if not no:
+                        no = temp_no or no
+
                     if not no:
                         print("skipping, no number found in", file)
                         continue
