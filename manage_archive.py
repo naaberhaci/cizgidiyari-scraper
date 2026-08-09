@@ -212,6 +212,50 @@ def detect_missing(path, replace_missing=True):
                 pass
             print("Eksik sayi icin dosya olusturuldu:", filename)
 
+        # Cleanup placeholders: remove empty "[XXXX] EKSIK" files if an actual file with the same index exists.
+        for fname in sorted(os.listdir(path)):
+            if not fname.startswith("[") or not fname.endswith("EKSIK"):
+                continue
+
+            fullpath = os.path.join(path, fname)
+            if not os.path.isfile(fullpath):
+                continue
+
+            try:
+                # only consider empty placeholder files
+                if os.path.getsize(fullpath) != 0:
+                    continue
+            except OSError:
+                continue
+
+            # extract the number between [ and ]
+            end_idx = fname.find("]")
+            if end_idx == -1:
+                continue
+            num = fname[1:end_idx]
+
+            # look for any other non-empty file that starts with the same [num]
+            for other in sorted(os.listdir(path)):
+                if other == fname:
+                    continue
+                if not other.startswith(f"[{num}]"):
+                    continue
+
+                other_full = os.path.join(path, other)
+                if not os.path.isfile(other_full):
+                    continue
+
+                try:
+                    if os.path.getsize(other_full) > 0:
+                        try:
+                            os.remove(fullpath)
+                            print("Gecici dosya silindi:", fname)
+                        except OSError:
+                            print("Gecici dosya silinirken hata olustu:", fname)
+                        break
+                except OSError:
+                    continue
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="ÇizgiDiyarı'ndan alınan arşivleri yeniden adlandırmak ve eksik dosyaları tespit etmek için bir araç.")
