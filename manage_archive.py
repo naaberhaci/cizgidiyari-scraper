@@ -30,8 +30,8 @@ def confirm_and_move(old, new, yes):
         confirmation = "y"
     else:
         confirmation = input(
-            f"rename\n\033[1;32;40m{old}\033[0m\nto\n\033[1;32;40m{new}\033"
-            f"[0m?\n(enter/y to confirm, s/n to skip, or enter custom order number. ESC to exit): "
+            f"Dosya adi\n\033[1;32;40m{old}\033[0m\nyeni isim\n\033[1;32;40m{new}\033"
+            f"[0m ile degistirilsin mi?\n(onay icin enter/y, atlamak icin s/n, ya da istediginiz sayiyi giriniz. ESC+enter ile cikabilirsiniz): "
         )
 
     def clear_lines(n=5):
@@ -59,7 +59,7 @@ def confirm_and_move(old, new, yes):
             # Check if the new name already exists
             if os.path.exists(new):
                 clear_lines(6)
-                print(f"File {new} already exists, skipping", old)
+                print(f"Dosya {new} zaten mevcut, atlaniyor", old)
                 return 0
             
             # Else, repeat the move with the new name
@@ -67,19 +67,19 @@ def confirm_and_move(old, new, yes):
             return confirm_and_move(old, new, yes)
         else:
             clear_lines(6)
-            print("Invalid order number, skipping", old)
+            print("Gecersiz sira numarasi, atlaniyor", old)
             return 0
     elif confirmation.lower() in ["s", "skip", "n", "no"]:
         clear_lines(5)
-        print("Skipping", old)
+        print("Atlaniyor:", old)
         return 0
     elif confirmation.lower() == "\x1b":  # ESC key
         clear_lines(5)
-        print("Exiting...")
+        print("Cikiliyor...")
         sys.exit(0)
     else:
         clear_lines(5)
-        print("Invalid input, skipping", old)
+        print("Gecersiz girdi, atlaniyor", old)
         return 0
 
 
@@ -102,7 +102,7 @@ def rename(path, undo=False, yes=False):
                 count += confirm_and_move(file, file_new, yes)
             else:
                 if is_formatted(file):
-                    print("skipping, already renamed", file)
+                    print("Atlaniyor, zaten yeniden adlandirilmis:", file)
                     continue
 
                 # Custom rules for some magazines
@@ -131,11 +131,11 @@ def rename(path, undo=False, yes=False):
                         no = temp_no or no
 
                     if not no:
-                        print("skipping, no number found in", file)
+                        print("Atlaniyor, dosyada numara bulunamadi:", file)
                         continue
 
                 if not no.isdigit():
-                    print("skipping, got nondigit no:", no, "from", file)
+                    print(f"Atlaniyor, gecersiz sayi numarasi {no} elde edildi:", file)
                     continue
 
                 no = int(no)
@@ -197,12 +197,12 @@ def detect_missing(path, replace_missing=True):
                     missing.extend(range(last_no + 1, no))
                 last_no = no
             else:
-                print("skipping unformatted file:", file)
+                print("Atlaniyor, formatlanmamis dosya:", file)
     
     if missing:
-        print("Missing files:", missing)
+        print("Eksik dosyalar:", missing)
     else:
-        print("No missing files until number", last_no)
+        print(f"{last_no} numarasina kadar eksik dosya bulunamadi")
 
     if replace_missing:
         for no in missing:
@@ -210,16 +210,16 @@ def detect_missing(path, replace_missing=True):
             filename = f"[{str(no).zfill(4)}] EKSIK"
             with open(filename, "w") as f:
                 pass
-            print("Created missing magazine file:", filename)
+            print("Eksik sayi icin dosya olusturuldu:", filename)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Manage a comic book directory from ÇizgiDiyarı")
-    parser.add_argument("path", help="Path to the directory")
-    parser.add_argument("--undo-rename", help="Undo the renaming", action="store_true")
-    parser.add_argument("--yes", help="Skip confirmation", action="store_true")
-    parser.add_argument("--no-detect-missing", help="Skip listing missing items", action="store_true")
-    parser.add_argument("--no-replace-missing", help="Skip replacing missing itema with blank file", action="store_true")
+    parser = argparse.ArgumentParser(description="ÇizgiDiyarı'ndan alınan arşivleri yeniden adlandırmak ve eksik dosyaları tespit etmek için bir araç.")
+    parser.add_argument("path", help="Arsiv dosyalarının bulunduğu dizin yolu")
+    parser.add_argument("--undo-rename", help="Yeniden adlandırmayı geri al", action="store_true")
+    parser.add_argument("--yes", help="Onaylamayı atla", action="store_true")
+    parser.add_argument("--no-detect-missing", help="Eksik öğeleri listelemeyi atla", action="store_true")
+    parser.add_argument("--no-replace-missing", help="Eksik öğeleri boş dosyalarla değiştirme", action="store_true")
 
     args = parser.parse_args()
 
@@ -230,7 +230,7 @@ if __name__ == "__main__":
     replace_missing_flag = not args.no_replace_missing
 
     if not os.path.exists(path):
-        print("Path does not exist:", path)
+        print("Dizin mevcut degil:", path)
         sys.exit(1)
 
     rename(path, undo, yes)
